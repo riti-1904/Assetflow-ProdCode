@@ -1,0 +1,13 @@
+node_modules/
+bin/
+obj/
+*.pdb
+*.user
+*.suo
+*.cache
+*.log
+.DS_Store
+.vs/
+.vscode/settings.json
+*.tmp
+*.temp
