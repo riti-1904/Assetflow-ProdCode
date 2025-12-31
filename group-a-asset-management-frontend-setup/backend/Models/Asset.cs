@@ -61,5 +61,8 @@ namespace AssetFlow.Auth.Models
         public AssetAssignment Assignment { get; set; }
         public List<AssetMovementHistory> Movements { get; set; }
         public List<AssetMaintenanceHistory> MaintenanceHistory { get; set; }
+        public List<Fault> Faults { get; set; }
+
+    
     }
 }
