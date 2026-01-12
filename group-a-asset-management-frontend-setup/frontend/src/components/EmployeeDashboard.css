@@ -1,0 +1,229 @@
+/* =================================================================
+   FILE: EmployeeDashboard.css
+   DESIGN: Final Professional Dashboard (V3 - Aligned with Image)
+   ================================================================= */
+
+/* --- Base & Typography --- */
+.employee-dashboard {
+  padding: 2.5rem;
+  background: #f8fafc;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* --- Dashboard Header --- */
+.dashboard-header {
+  margin-bottom: 2.5rem;
+}
+.dashboard-header h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -1px;
+  margin: 0;
+}
+.dashboard-header p {
+  font-size: 1rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* --- Main Layout (Matches Screenshot) --- */
+.dashboard-layout {
+  display: grid;
+  /* Two columns: a main content area and a narrower sidebar */
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 2rem;
+}
+.main-column, .sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* --- General Card Styling --- */
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.card-header-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  background-color: #f0fdfa;
+  border-radius: 8px;
+}
+.card-header-icon svg { width: 18px; height: 18px; color: #00A3A1; }
+.card-header h2 {
+  font-size: 1.125rem; font-weight: 600;
+  color: #334155; margin: 0;
+}
+
+.card-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+/* --- Profile Card --- */
+.profile-info {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.profile-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #00A3A1, #4bb39a);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem; font-weight: 300; margin: 0 auto 1rem;
+  border: 4px solid white; box-shadow: 0 0 0 2px #00A3A1;
+}
+.profile-info h3 { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin: 0 0 0.25rem; }
+.profile-info p { font-size: 0.875rem; color: #64748b; margin: 0; }
+.profile-details .detail-item {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.875rem; padding: 0.8rem 0; border-bottom: 1px solid #f8fafc;
+}
+.profile-details .detail-item:last-child { border-bottom: none; }
+.profile-details .detail-label { color: #64748b; }
+.profile-details .detail-value { color: #334155; font-weight: 500; text-align: right; }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.6rem;
+  border-radius: 99px; font-size: 0.75rem; font-weight: 600;
+}
+.status-badge.active { background-color: #dcfce7; color: #166534; }
+
+/* --- Assets Section --- */
+.assets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+.asset-item {
+  background-color: #f8fafc; border: 1px solid #f1f5f9;
+  border-radius: 12px; padding: 1rem;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+  cursor: pointer;
+}
+.asset-item:hover {
+  border-color: #99f6e4; background-color: #ffffff;
+  transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0, 163, 161, 0.1);
+}
+.asset-icon-wrapper { color: #00A3A1; margin-bottom: 0.75rem; }
+.asset-icon-wrapper svg { width: 24px; height: 24px; }
+.asset-item h4 { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 0 0 0.25rem; }
+.asset-item p { font-size: 0.875rem; color: #64748b; margin: 0; }
+.asset-tag {
+  font-family: 'Fira Code', monospace; font-size: 0.75rem; color: #0f766e;
+  background-color: #ccfbf1; padding: 0.2rem 0.5rem;
+  border-radius: 4px; margin-top: 0.75rem; display: inline-block;
+}
+
+/* --- Tickets Card --- */
+.tickets-table { width: 100%; border-collapse: collapse; }
+.tickets-table th, .tickets-table td {
+  padding: 1rem; text-align: left; font-size: 0.875rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.tickets-table th { font-weight: 600; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.tickets-table tbody tr:hover { background-color: #f8fafc; }
+.ticket-status {
+  padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem;
+  font-weight: 500; text-align: center; display: inline-block;
+}
+.ticket-status.resolved { background-color: #dcfce7; color: #166534; }
+.ticket-status.closed { background-color: #e5e7eb; color: #374151; }
+.ticket-status.in-progress { background-color: #fef3c7; color: #92400e; }
+
+/* --- Quick Actions Card --- */
+.actions-list { display: flex; flex-direction: column; gap: 1rem; }
+.action-button {
+  width: 100%; display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 500;
+  color: #334155; background-color: #f8fafc;
+  border: 1px solid #f1f5f9; border-radius: 8px; cursor: pointer;
+  text-align: left; transition: all 0.2s ease;
+}
+.action-button svg { width: 16px; height: 16px; color: #00A3A1; }
+.action-button:hover {
+  background-color: #f0fdfa; border-color: #99f6e4; color: #0f766e;
+  transform: translateX(4px);
+}
+.action-button:hover svg { color: #0f766e; }
+
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+  .dashboard-layout { grid-template-columns: 1fr; }
+  .assets-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+@media (max-width: 768px) {
+  .employee-dashboard { padding: 1.5rem; }
+  .dashboard-header h1 { font-size: 1.8rem; }
+  .assets-grid { grid-template-columns: 1fr; }
+}
+
+/* --- Modal Styles --- */
+body.modal-open { overflow: hidden; }
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(30, 41, 59, 0.8);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  z-index: 1000; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+.modal-content {
+  background-color: #ffffff; border-radius: 16px; width: 100%; max-width: 550px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  animation: slideUp 0.4s ease-out;
+}
+.modal-header {
+  padding: 1.5rem; border-bottom: 1px solid #f1f5f9; display: flex;
+  justify-content: space-between; align-items: center;
+}
+.modal-header h3 { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin: 0; }
+.modal-close-btn {
+  background: #f1f5f9; border: none; border-radius: 50%; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #64748b; transition: all 0.2s;
+}
+.modal-close-btn:hover { background-color: #e2e8f0; color: #1e293b; }
+.modal-close-btn svg { width: 18px; height: 18px; }
+.modal-body { padding: 1.5rem; }
+.asset-main-info {
+  display: flex; gap: 1.5rem; align-items: center; padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem; border-bottom: 1px solid #f1f5f9;
+}
+.modal-asset-icon {
+  flex-shrink: 0; width: 60px; height: 60px; background-color: #f0fdfa;
+  border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; color: #00A3A1;
+}
+.modal-asset-icon svg { width: 32px; height: 32px; }
+.asset-main-info h4 { font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0; }
+.asset-main-info p { font-size: 0.875rem; color: #64748b; margin: 0.25rem 0 0; }
+.asset-spec-list { list-style: none; padding: 0; margin: 0; }
+.asset-spec-item {
+  display: flex; justify-content: space-between; padding: 0.8rem 0;
+  font-size: 0.875rem; border-bottom: 1px solid #f8fafc;
+}
+.asset-spec-item:last-child { border-bottom: none; }
+.asset-spec-label { color: #64748b; }
+.asset-spec-value { color: #334155; font-weight: 500; }
+
+/* Keyframe Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

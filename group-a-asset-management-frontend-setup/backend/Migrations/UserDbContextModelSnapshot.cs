@@ -109,7 +109,7 @@ namespace AssetFlowBackend.Migrations
 
                     b.HasKey("AssetId");
 
-                    b.ToTable("Assets");
+                    b.ToTable("Assets", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.AssetAssignment", b =>
@@ -150,7 +150,7 @@ namespace AssetFlowBackend.Migrations
                     b.HasIndex("AssetId")
                         .IsUnique();
 
-                    b.ToTable("AssetAssignments");
+                    b.ToTable("AssetAssignments", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.AssetMaintenanceHistory", b =>
@@ -194,7 +194,7 @@ namespace AssetFlowBackend.Migrations
 
                     b.HasIndex("AssetId");
 
-                    b.ToTable("AssetMaintenanceHistories");
+                    b.ToTable("AssetMaintenanceHistories", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.AssetMovementHistory", b =>
@@ -238,7 +238,7 @@ namespace AssetFlowBackend.Migrations
 
                     b.HasIndex("AssetId");
 
-                    b.ToTable("AssetMovementHistories");
+                    b.ToTable("AssetMovementHistories", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.AssetTechnicalSpecification", b =>
@@ -284,7 +284,7 @@ namespace AssetFlowBackend.Migrations
                     b.HasIndex("AssetId")
                         .IsUnique();
 
-                    b.ToTable("AssetTechnicalSpecifications");
+                    b.ToTable("AssetTechnicalSpecifications", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.Fault", b =>
@@ -336,7 +336,7 @@ namespace AssetFlowBackend.Migrations
 
                     b.HasIndex("ReportedByUserId");
 
-                    b.ToTable("Faults");
+                    b.ToTable("Faults", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.User", b =>
@@ -374,7 +374,7 @@ namespace AssetFlowBackend.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("AssetFlow.Auth.Models.AssetAssignment", b =>

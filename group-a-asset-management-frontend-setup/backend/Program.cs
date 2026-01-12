@@ -14,6 +14,10 @@ builder.Services.AddControllers()
     {
         // Prevent circular reference crashes (Asset ↔ Fault ↔ User)
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+        // 🔥 DASHBOARD FIX: camelCase for frontend
+        options.JsonSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.CamelCase;
     });
 
 // =======================
@@ -45,11 +49,12 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins(
                     "http://localhost:5173", // Vite
-                    "http://localhost:3000", // CRA
+                    "http://localhost:3000",
                     "http://localhost:3001"
                 )
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials(); // 🔥 DASHBOARD FIX
         });
 });
 
@@ -58,16 +63,90 @@ var app = builder.Build();
 // =======================
 // Middleware Order (CRITICAL)
 // =======================
-app.UseCors("AllowFrontend");     // ✅ MUST be first
-app.UseAuthentication();          // Azure AD
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Simple health check
+// Health check
 app.MapGet("/", () => "AssetFlow API Running");
 
 app.Run();
+
+
+//-----BEFORE DASHBOARD INTEGRATION - WORKING CODE
+
+// using Microsoft.AspNetCore.Authentication.JwtBearer;
+// using Microsoft.EntityFrameworkCore;
+// using Microsoft.Identity.Web;
+// using AssetFlow.Auth.Data;
+// using System.Text.Json.Serialization;
+
+// var builder = WebApplication.CreateBuilder(args);
+
+// // =======================
+// // Controllers + JSON
+// // =======================
+// builder.Services.AddControllers()
+//     .AddJsonOptions(options =>
+//     {
+//         // Prevent circular reference crashes (Asset ↔ Fault ↔ User)
+//         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+//     });
+
+// // =======================
+// // Database
+// // =======================
+// builder.Services.AddDbContext<UserDbContext>(options =>
+// {
+//     options.UseSqlServer(
+//         builder.Configuration.GetConnectionString("MySqlConnection")
+//     );
+// });
+
+// // =======================
+// // Authentication (Azure AD)
+// // =======================
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+// builder.Services.AddAuthorization();
+
+// // =======================
+// // CORS (Frontend Integration)
+// // =======================
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowFrontend",
+//         policy =>
+//         {
+//             policy
+//                 .WithOrigins(
+//                     "http://localhost:5173", // Vite
+//                     "http://localhost:3000", // CRA
+//                     "http://localhost:3001"
+//                 )
+//                 .AllowAnyHeader()
+//                 .AllowAnyMethod();
+//         });
+// });
+
+// var app = builder.Build();
+
+// // =======================
+// // Middleware Order (CRITICAL)
+// // =======================
+// app.UseCors("AllowFrontend");     // ✅ MUST be first
+// app.UseAuthentication();          // Azure AD
+// app.UseAuthorization();
+
+// app.MapControllers();
+
+// // Simple health check
+// app.MapGet("/", () => "AssetFlow API Running");
+
+// app.Run();
 
 
 

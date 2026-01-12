@@ -1,13 +1,13 @@
-using AssetFlow.Auth.Data;
-using AssetFlow.Auth.DTOs;
-using AssetFlow.Auth.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AssetFlow.Auth.Data;
+using AssetFlow.Auth.Models;
+using AssetFlow.Auth.DTOs;
 
 namespace AssetFlow.Auth.Controllers
 {
     [ApiController]
-    [Route("api/faults")]
+    [Route("api/[controller]")]
     public class FaultsController : ControllerBase
     {
         private readonly UserDbContext _context;
@@ -17,82 +17,236 @@ namespace AssetFlow.Auth.Controllers
             _context = context;
         }
 
-        // GET ALL
+        // GET: api/faults
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<object>>> GetFaults()
         {
-            var faults = await _context.Faults
-                .Include(f => f.Asset)
-                .Include(f => f.Reporter)
-                .Include(f => f.Technician)
-                .OrderByDescending(f => f.ReportedAt)
-                .ToListAsync();
-
-            return Ok(faults);
-        }
-
-        // GET BY ID
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
-        {
-            var fault = await _context.Faults
-                .Include(f => f.Asset)
-                .Include(f => f.Reporter)
-                .Include(f => f.Technician)
-                .FirstOrDefaultAsync(f => f.FaultId == id);
-
-            if (fault == null) return NotFound();
-            return Ok(fault);
-        }
-
-        // CREATE
-        [HttpPost]
-        public async Task<IActionResult> Create(FaultCreateDto dto)
-        {
-            var fault = new Fault
+            try
             {
-                AssetId = dto.AssetId,
-                ReportedByUserId = dto.ReportedByUserId,
-                Description = dto.Description,
-                Severity = dto.Severity,
-                Status = "New"
-            };
+                var faults = await _context.Faults
+                    .Include(f => f.Asset)
+                    .Include(f => f.Reporter)
+                    .Include(f => f.Technician)
+                    .OrderByDescending(f => f.ReportedAt)
+                    .ToListAsync();
 
-            _context.Faults.Add(fault);
-            await _context.SaveChangesAsync();
+                var response = faults.Select(f => new
+                {
+                    faultId = f.FaultId,
+                    status = f.Status,
+                    severity = f.Severity,
+                    description = f.Description,
+                    reportedAt = f.ReportedAt,
+                    resolvedAt = f.ResolvedAt,
+                    rootCauseNotes = f.RootCauseNotes,
+                    resolution = f.Resolution,
+                    asset = f.Asset != null ? new
+                    {
+                        assetId = f.Asset.AssetId,
+                        assetTag = f.Asset.LaptopAssetsTag ?? f.Asset.DasId ?? "N/A",
+                        assetName = $"{f.Asset.Make} {f.Asset.Model}".Trim()
+                    } : null,
+                    reporter = f.Reporter != null ? new
+                    {
+                        userId = f.Reporter.UserId,
+                        name = f.Reporter.Name ?? "Unknown User"
+                    } : null,
+                    technician = f.Technician != null ? new
+                    {
+                        userId = f.Technician.UserId,
+                        name = f.Technician.Name ?? "Unknown User"
+                    } : null
+                }).ToList();
 
-            return Ok(fault);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving faults", error = ex.Message });
+            }
         }
 
-        // UPDATE
+        // GET: api/faults/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<object>> GetFault(int id)
+        {
+            try
+            {
+                var fault = await _context.Faults
+                    .Include(f => f.Asset)
+                    .Include(f => f.Reporter)
+                    .Include(f => f.Technician)
+                    .FirstOrDefaultAsync(f => f.FaultId == id);
+
+                if (fault == null)
+                {
+                    return NotFound(new { message = "Fault not found" });
+                }
+
+                var response = new
+                {
+                    faultId = fault.FaultId,
+                    status = fault.Status,
+                    severity = fault.Severity,
+                    description = fault.Description,
+                    reportedAt = fault.ReportedAt,
+                    resolvedAt = fault.ResolvedAt,
+                    rootCauseNotes = fault.RootCauseNotes,
+                    resolution = fault.Resolution,
+                    asset = fault.Asset != null ? new
+                    {
+                        assetId = fault.Asset.AssetId,
+                        assetTag = fault.Asset.LaptopAssetsTag ?? fault.Asset.DasId ?? "N/A",
+                        assetName = $"{fault.Asset.Make} {fault.Asset.Model}".Trim(),
+                        location = fault.Asset.AssetsLocation,
+                        category = fault.Asset.LaptopCategory
+                    } : null,
+                    reporter = fault.Reporter != null ? new
+                    {
+                        userId = fault.Reporter.UserId,
+                        name = fault.Reporter.Name ?? "Unknown User",
+                        email = fault.Reporter.Email
+                    } : null,
+                    technician = fault.Technician != null ? new
+                    {
+                        userId = fault.Technician.UserId,
+                        name = fault.Technician.Name ?? "Unknown User",
+                        email = fault.Technician.Email
+                    } : null
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error retrieving fault", error = ex.Message });
+            }
+        }
+
+        // POST: api/faults
+        [HttpPost]
+        public async Task<ActionResult<object>> CreateFault([FromBody] FaultCreateDto dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var asset = await _context.Assets.FindAsync(dto.AssetId);
+                if (asset == null)
+                {
+                    return BadRequest(new { message = "Asset not found" });
+                }
+
+                var reporter = await _context.Users.FindAsync(dto.ReportedByUserId);
+                if (reporter == null)
+                {
+                    return BadRequest(new { message = "Reporter not found" });
+                }
+
+                var fault = new Fault
+                {
+                    AssetId = dto.AssetId,
+                    ReportedByUserId = dto.ReportedByUserId,
+                    Description = dto.Description,
+                    Severity = dto.Severity,
+                    Status = "Open",
+                    ReportedAt = DateTime.UtcNow
+                };
+
+                _context.Faults.Add(fault);
+                await _context.SaveChangesAsync();
+
+                var response = new
+                {
+                    faultId = fault.FaultId,
+                    status = fault.Status,
+                    severity = fault.Severity,
+                    description = fault.Description,
+                    reportedAt = fault.ReportedAt
+                };
+
+                return CreatedAtAction(nameof(GetFault), new { id = fault.FaultId }, response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error creating fault", error = ex.Message });
+            }
+        }
+
+        // PUT: api/faults/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, FaultUpdateDto dto)
+        public async Task<IActionResult> UpdateFault(int id, [FromBody] FaultUpdateDto dto)
         {
-            var fault = await _context.Faults.FindAsync(id);
-            if (fault == null) return NotFound();
+            try
+            {
+                var fault = await _context.Faults.FindAsync(id);
+                if (fault == null)
+                {
+                    return NotFound(new { message = "Fault not found" });
+                }
 
-            fault.Status = dto.Status;
-            fault.AssignedToUserId = dto.AssignedToUserId;
-            fault.RootCauseNotes = dto.RootCauseNotes;
-            fault.Resolution = dto.Resolution;
+                if (!string.IsNullOrWhiteSpace(dto.Status))
+                {
+                    fault.Status = dto.Status;
+                }
 
-            if (dto.Status == "Resolved")
-                fault.ResolvedAt = DateTime.UtcNow;
+                if (dto.AssignedToUserId.HasValue)
+                {
+                    var technician = await _context.Users.FindAsync(dto.AssignedToUserId.Value);
+                    if (technician == null)
+                    {
+                        return BadRequest(new { message = "Technician not found" });
+                    }
+                    fault.AssignedToUserId = dto.AssignedToUserId.Value;
+                }
 
-            await _context.SaveChangesAsync();
-            return Ok(fault);
+                if (!string.IsNullOrWhiteSpace(dto.RootCauseNotes))
+                {
+                    fault.RootCauseNotes = dto.RootCauseNotes;
+                }
+
+                if (!string.IsNullOrWhiteSpace(dto.Resolution))
+                {
+                    fault.Resolution = dto.Resolution;
+                    fault.Status = "Resolved";
+                    fault.ResolvedAt = DateTime.UtcNow;
+                }
+
+                _context.Faults.Update(fault);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Fault updated successfully", faultId = fault.FaultId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error updating fault", error = ex.Message });
+            }
         }
 
-        // DELETE
+        // DELETE: api/faults/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteFault(int id)
         {
-            var fault = await _context.Faults.FindAsync(id);
-            if (fault == null) return NotFound();
+            try
+            {
+                var fault = await _context.Faults.FindAsync(id);
+                if (fault == null)
+                {
+                    return NotFound(new { message = "Fault not found" });
+                }
 
-            _context.Faults.Remove(fault);
-            await _context.SaveChangesAsync();
-            return Ok();
+                _context.Faults.Remove(fault);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Fault deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error deleting fault", error = ex.Message });
+            }
         }
     }
 }

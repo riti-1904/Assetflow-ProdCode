@@ -3,39 +3,44 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AssetFlow.Auth.Models
 {
+    [Table("Faults")]
     public class Fault
     {
         [Key]
+        [Column("FaultId")]
         public int FaultId { get; set; }
 
-        [Required]
+        [Column("AssetId")]
         public int AssetId { get; set; }
+        public virtual Asset? Asset { get; set; }
 
-        [Required]
+        [Column("ReportedByUserId")]
         public int ReportedByUserId { get; set; }
+        public virtual User? Reporter { get; set; }
 
+        [Column("AssignedToUserId")]
         public int? AssignedToUserId { get; set; }
+        public virtual User? Technician { get; set; }
 
-        [Required]
+        [Column("Description")]
         public string Description { get; set; } = string.Empty;
 
-        [Required]
+        [Column("Severity")]
         public string Severity { get; set; } = "Low";
 
-        [Required]
-        public string Status { get; set; } = "New";
+        [Column("Status")]
+        public string Status { get; set; } = "Open";
 
-        public DateTime ReportedAt { get; set; } = DateTime.UtcNow;
-
-        public DateTime? ResolvedAt { get; set; }
-
+        [Column("RootCauseNotes")]
         public string? RootCauseNotes { get; set; }
 
+        [Column("Resolution")]
         public string? Resolution { get; set; }
 
-        // Navigation
-        public Asset Asset { get; set; }
-        public User Reporter { get; set; }
-        public User? Technician { get; set; }
+        [Column("ReportedAt")]
+        public DateTime ReportedAt { get; set; }
+
+        [Column("ResolvedAt")]
+        public DateTime? ResolvedAt { get; set; }
     }
 }
